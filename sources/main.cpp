@@ -52,7 +52,7 @@ int main( int argc, char* argv[] )
     }
     YY_BUFFER_STATE lexerState = k_scan_string( content.c_str(), lexer );
     if( cmd->second == C_Lexer ) {
-        klex( lexer );
+        while( klex( lexer ) ) {}
     }
 
     k_delete_buffer( lexerState, lexer );
