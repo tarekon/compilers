@@ -32,5 +32,8 @@ foreach( file ${test_samples} )
     add_test( NAME Calc_${nn} COMMAND ${CMAKE_BINARY_DIR}/Kalculator calc ${file} )
 endforeach()
 
+set_tests_properties( Calc_complex.test PROPERTIES PASS_REGULAR_EXPRESSION "Result is 7" )
+
+
 add_test( NAME Print_Invalid COMMAND ${CMAKE_BINARY_DIR}/Kalculator print ssd )
 set_tests_properties( Print_Invalid PROPERTIES WILL_FAIL true )
