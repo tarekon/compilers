@@ -2,15 +2,18 @@
 #include <fstream>
 #include <unordered_map>
 #include <string>
+#include <kLexer.h>
 
 using namespace std;
 
 enum TCommand {
     C_Print,
+    C_Lexer,
 };
 
 unordered_map<string,TCommand> commandMap = {
     { "print", C_Print },
+    { "lexer", C_Lexer },
 };
 
 int main( int argc, char* argv[] )
@@ -42,6 +45,18 @@ int main( int argc, char* argv[] )
         return 0;
     }
 
-    cout << "Hello world";
+    yyscan_t lexer;
+    if( klex_init( &lexer ) ) {
+        cerr << "Unable to initialize lexer" << endl;
+        return -4;
+    }
+    YY_BUFFER_STATE lexerState = k_scan_string( content.c_str(), lexer );
+    if( cmd->second == C_Lexer ) {
+        klex( lexer );
+    }
+
+    k_delete_buffer( lexerState, lexer );
+    klex_destroy( lexer );
+
     return 0;
 }
