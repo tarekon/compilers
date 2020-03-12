@@ -2,6 +2,8 @@
 #include <fstream>
 #include <unordered_map>
 #include <string>
+
+#include <kParser.hpp>
 #include <kLexer.h>
 
 using namespace std;
@@ -52,7 +54,15 @@ int main( int argc, char* argv[] )
     }
     YY_BUFFER_STATE lexerState = k_scan_string( content.c_str(), lexer );
     if( cmd->second == C_Lexer ) {
-        while( klex( lexer ) ) {}
+        KSTYPE semanticValue;
+
+        int code = klex( &semanticValue, lexer );
+        while( code != 0 ) {
+            if( code == NUMBER ) {
+                cout << "<" << semanticValue.Number << "> ";
+            }
+            code = klex( &semanticValue, lexer );
+        }
     }
 
     k_delete_buffer( lexerState, lexer );
