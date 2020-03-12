@@ -6,7 +6,7 @@
 
 using namespace std;
 
-int kerror( yyscan_t scanner, const char* msg )
+int kerror( yyscan_t scanner, int& result, const char* msg )
 {
     cerr << "kerror called: '" << msg << "'" << endl;
     return 0;
@@ -29,6 +29,7 @@ typedef void* yyscan_t;
 %define api.prefix {k}
 %define api.pure
 %param { yyscan_t scanner }
+%parse-param { int& result }
 
 %union {
     int Number;
@@ -37,7 +38,17 @@ typedef void* yyscan_t;
 %token MUL
 %token PLUS
 %token <Number> NUMBER
+%type <Number> Expression
+
+%left PLUS
+%left MUL
 
 %%
 
-Start: %empty
+Start: Expression[E] { result = $E; }
+;
+
+Expression: NUMBER[N] { $$ = $N; }
+    | Expression[L] PLUS Expression[R] { $$ = $L + $R; }
+    | Expression[L] MUL Expression[R] { $$ = $L * $R; }
+;

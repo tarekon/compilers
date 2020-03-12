@@ -11,11 +11,13 @@ using namespace std;
 enum TCommand {
     C_Print,
     C_Lexer,
+    C_Calc,
 };
 
 unordered_map<string,TCommand> commandMap = {
     { "print", C_Print },
     { "lexer", C_Lexer },
+    { "calc", C_Calc },
 };
 
 int main( int argc, char* argv[] )
@@ -65,8 +67,18 @@ int main( int argc, char* argv[] )
         }
     }
 
+    int status = 0;
+    if( cmd->second == C_Calc ) {
+        int result;
+        if( kparse( lexer, result ) ) {
+            status = -13;
+        } else {
+            cout << "Result is " << result << endl;
+        }
+    }
+
     k_delete_buffer( lexerState, lexer );
     klex_destroy( lexer );
 
-    return 0;
+    return status;
 }
