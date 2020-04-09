@@ -2,6 +2,8 @@
 #include <fstream>
 #include <unordered_map>
 #include <string>
+#include <SyntaxTree.h>
+#include <Visitor.h>
 
 #include <kParser.hpp>
 #include <kLexer.h>
@@ -69,12 +71,16 @@ int main( int argc, char* argv[] )
 
     int status = 0;
     if( cmd->second == C_Calc ) {
-        int result;
+        Expression* result = 0;
         if( kparse( lexer, result ) ) {
             status = -13;
         } else {
-            cout << "Result is " << result << endl;
+            CalcVisitor v;
+            result->accept( &v );
+
+            cout << "Result is " << v.GetValue() << endl;
         }
+        delete result;
     }
 
     k_delete_buffer( lexerState, lexer );

@@ -6,7 +6,7 @@
 
 using namespace std;
 
-int kerror( yyscan_t scanner, int& result, const char* msg )
+int kerror( yyscan_t scanner, Expression*& result, const char* msg )
 {
     cerr << "kerror called: '" << msg << "'" << endl;
     return 0;
@@ -16,6 +16,8 @@ int kerror( yyscan_t scanner, int& result, const char* msg )
 
 %code requires
 {
+
+#include <SyntaxTree.h>
 
 #ifndef YY_TYPEDEF_YY_SCANNER_T
 #define YY_TYPEDEF_YY_SCANNER_T
@@ -29,16 +31,17 @@ typedef void* yyscan_t;
 %define api.prefix {k}
 %define api.pure
 %param { yyscan_t scanner }
-%parse-param { int& result }
+%parse-param { Expression*& result }
 
 %union {
     int Number;
+    Expression* Exp;
 }
 
 %token MUL
 %token PLUS
 %token <Number> NUMBER
-%type <Number> Expression
+%type <Exp> Expression
 
 %left PLUS
 %left MUL
@@ -48,7 +51,7 @@ typedef void* yyscan_t;
 Start: Expression[E] { result = $E; }
 ;
 
-Expression: NUMBER[N] { $$ = $N; }
-    | Expression[L] PLUS Expression[R] { $$ = $L + $R; }
-    | Expression[L] MUL Expression[R] { $$ = $L * $R; }
+Expression: NUMBER[N] { $$ = new NumExpression( $N ); }
+    | Expression[L] PLUS Expression[R] { $$ = new BinopExpression( $L, BinopExpression::OC_Plus, $R ); }
+    | Expression[L] MUL Expression[R] { $$ = new BinopExpression( $L, BinopExpression::OC_Mul, $R ); }
 ;
