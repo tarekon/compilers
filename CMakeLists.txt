@@ -32,11 +32,15 @@ foreach( file ${test_samples} )
     add_test( NAME Print_${nn} COMMAND ${CMAKE_BINARY_DIR}/Kalculator print ${file} )
     add_test( NAME Lexer_${nn} COMMAND ${CMAKE_BINARY_DIR}/Kalculator lexer ${file} )
     add_test( NAME Calc_${nn} COMMAND ${CMAKE_BINARY_DIR}/Kalculator calc ${file} )
+    add_test( NAME Valgrind_calc_${nn} COMMAND valgrind --leak-check=full --error-exitcode=-100 ${CMAKE_BINARY_DIR}/Kalculator calc ${file} )
 endforeach()
 
 set_tests_properties( Calc_complex.test PROPERTIES PASS_REGULAR_EXPRESSION "Result is 7" )
 set_tests_properties( Calc_mul.test PROPERTIES PASS_REGULAR_EXPRESSION "Result is 80810730" )
 set_tests_properties( Calc_sum.test PROPERTIES PASS_REGULAR_EXPRESSION "Result is 23657" )
 
-add_test( NAME Print_Invalid COMMAND ${CMAKE_BINARY_DIR}/Kalculator print ssd )
-set_tests_properties( Print_Invalid PROPERTIES WILL_FAIL true )
+set_tests_properties( Calc_invalid.test PROPERTIES WILL_FAIL true )
+set_tests_properties( Valgrind_calc_invalid.test PROPERTIES WILL_FAIL true )
+
+add_test( NAME Print_NotFound COMMAND ${CMAKE_BINARY_DIR}/Kalculator print ssd )
+set_tests_properties( Print_NotFound PROPERTIES WILL_FAIL true )

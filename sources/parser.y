@@ -46,6 +46,8 @@ typedef void* yyscan_t;
 %left PLUS
 %left MUL
 
+%destructor { delete $$; } Expression
+
 %%
 
 Start: Expression[E] { result = $E; }
