@@ -24,6 +24,9 @@ jobs:
 
     # Runs a single command using the runners shell
     - name: Configure Debug
+      run: cmake . -B debug
+      
+    - name: Build debug
       run: cmake --build debug
 
     - name: Run tests
