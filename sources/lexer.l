@@ -16,7 +16,7 @@ NUMBER {DIGIT}+
 
 %%
 
-{NUMBER}        { cout << "NUMBER "; yylval->Number = atoi( yytext ); return NUMBER; }
-"+"             { cout << "PLUS "; return PLUS; }
-"*"             { cout << "MUL "; return MUL; }
+{NUMBER}        { /*cout << "NUMBER "; */ yylval->Number = atoi( yytext ); return NUMBER; }
+"+"             { /*cout << "PLUS "; */ return PLUS; }
+"*"             { /*cout << "MUL "; */ return MUL; }
 " "             {}

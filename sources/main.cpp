@@ -4,6 +4,7 @@
 #include <string>
 #include <SyntaxTree.h>
 #include <Visitor.h>
+#include <SyntaxTreePrinter.h>
 
 #include <kParser.hpp>
 #include <kLexer.h>
@@ -11,15 +12,17 @@
 using namespace std;
 
 enum TCommand {
-    C_Print,
+    C_PrintTokens,
     C_Lexer,
     C_Calc,
+    C_PrintAst,
 };
 
 unordered_map<string,TCommand> commandMap = {
-    { "print", C_Print },
+    { "print", C_PrintTokens },
     { "lexer", C_Lexer },
     { "calc", C_Calc },
+    { "printAst", C_PrintAst },
 };
 
 int main( int argc, char* argv[] )
@@ -46,7 +49,7 @@ int main( int argc, char* argv[] )
     string content{ istreambuf_iterator<char>( inputFileStream ),
         istreambuf_iterator<char>() };
 
-    if( cmd->second == C_Print ) {
+    if( cmd->second == C_PrintTokens ) {
         cout << content << endl;
         return 0;
     }
@@ -57,6 +60,8 @@ int main( int argc, char* argv[] )
         return -4;
     }
     YY_BUFFER_STATE lexerState = k_scan_string( content.c_str(), lexer );
+
+    int status = 0;
     if( cmd->second == C_Lexer ) {
         KSTYPE semanticValue;
 
@@ -67,20 +72,24 @@ int main( int argc, char* argv[] )
             }
             code = klex( &semanticValue, lexer );
         }
-    }
-
-    int status = 0;
-    if( cmd->second == C_Calc ) {
+    } else {
         Expression* result = 0;
         if( kparse( lexer, result ) ) {
             status = -13;
         } else {
-            CalcVisitor v;
-            result->accept( &v );
+            std::unique_ptr<Expression> resultHolder( result );
+            if( cmd->second == C_Calc ) {
+                CalcVisitor v;
+                result->accept( &v );
 
-            cout << "Result is " << v.GetValue() << endl;
+                cout << "Result is " << v.GetValue() << endl;
+            } else if( cmd->second == C_PrintAst ) {
+                SyntaxTreePrinter printer;
+                result->accept( &printer );
+
+                cout << printer.ToString() << endl;
+            }
         }
-        delete result;
     }
 
     k_delete_buffer( lexerState, lexer );
