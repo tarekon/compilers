@@ -39,8 +39,23 @@ set_tests_properties( Calc_complex.test PROPERTIES PASS_REGULAR_EXPRESSION "Resu
 set_tests_properties( Calc_mul.test PROPERTIES PASS_REGULAR_EXPRESSION "Result is 80810730" )
 set_tests_properties( Calc_sum.test PROPERTIES PASS_REGULAR_EXPRESSION "Result is 23657" )
 
-set_tests_properties( Valgrind_calc_invalid.test PROPERTIES WILL_FAIL true )
-set_tests_properties( Calc_invalid.test PROPERTIES WILL_FAIL true )
+file( GLOB test_samples "invalid_samples/*.test" )
+foreach( file ${test_samples} )
+    get_filename_component( nn ${file} NAME )
+
+    add_test( NAME Print_${nn} COMMAND ${CMAKE_BINARY_DIR}/Kalculator print ${file} )
+
+    add_test( NAME Lexer_${nn} COMMAND ${CMAKE_BINARY_DIR}/Kalculator lexer ${file} )
+
+    add_test( NAME Calc_${nn} COMMAND ${CMAKE_BINARY_DIR}/Kalculator calc ${file} )
+    set_tests_properties( Calc_${nn} PROPERTIES WILL_FAIL true )
+
+    add_test( NAME Valgrind_calc_${nn} COMMAND valgrind ${CMAKE_BINARY_DIR}/Kalculator calc ${file} )
+    set_tests_properties( Valgrind_calc_${nn} PROPERTIES WILL_FAIL true )
+
+    add_test( NAME BuildAstDot_${nn} COMMAND ${CMAKE_BINARY_DIR}/Kalculator printAst ${file} )
+    set_tests_properties( BuildAstDot_${nn} PROPERTIES WILL_FAIL true )
+endforeach()
 
 add_test( NAME Print_Invalid COMMAND ${CMAKE_BINARY_DIR}/Kalculator print ssd )
 set_tests_properties( Print_Invalid PROPERTIES WILL_FAIL true )
